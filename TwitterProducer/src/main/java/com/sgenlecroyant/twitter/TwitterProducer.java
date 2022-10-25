@@ -5,15 +5,14 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.sgenlecroyant.twitter.client.TwitterClient;
 import com.sgenlecroyant.twitter.client.TwitterClientAuth;
 import com.sgenlecroyant.twitter.client.TwitterClientAuthService;
-import com.twitter.hbc.ClientBuilder;
+import com.sgenlecroyant.twitter.service.TwitterStreamingService;
+import com.sgenlecroyant.twitter.service.TwitterStreamsRunner;
 import com.twitter.hbc.core.Client;
 import com.twitter.hbc.core.Constants;
 import com.twitter.hbc.core.Hosts;
@@ -22,11 +21,9 @@ import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.processor.HosebirdMessageProcessor;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
-import com.twitter.hbc.httpclient.auth.OAuth1;
 
 @SpringBootApplication
 public class TwitterProducer {
-	private final static Logger LOGGER = LoggerFactory.getLogger(TwitterProducer.class);
 
 	public static void main(String[] args) throws InterruptedException {
 		SpringApplication.run(TwitterProducer.class, args);
@@ -51,26 +48,11 @@ public class TwitterProducer {
 
 		HosebirdMessageProcessor messageProcessor = new StringDelimitedProcessor(messages);
 		Client client = TwitterClient.createClient(authentication, statusesFilterEndpoint, hosts, messageProcessor);
-
-		System.out.println("before connecting ...");
 		client.connect();
-		System.out.println("after connecting ...");
 
-		String message = null;
+		TwitterStreamsRunner streamsRunner = new TwitterStreamingService();
 
-		while (!client.isDone()) {
-			if (message == null) {
-				try {
-					message = messages.take();
-					LOGGER.info(message);
-					message = null;
-				} catch (InterruptedException e) {
-					LOGGER.error("Encountered an error: " + e);
-				}
-			}
-
-		}
-
+		streamsRunner.startStreamingRealTimeTwitterFeeds(client, messages);
 	}
 
 }

@@ -2,8 +2,10 @@ package com.sgenlecroyant.twitter.service;
 
 public class TwitterService {
 
-	public void sayHi() {
+	private GreetingService greetingService;
 
+	public String greetNow() {
+		return this.greetingService.greet();
 	}
 
 }

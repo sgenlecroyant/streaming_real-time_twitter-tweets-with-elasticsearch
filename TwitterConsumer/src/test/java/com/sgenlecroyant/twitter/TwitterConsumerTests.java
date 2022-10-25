@@ -8,6 +8,7 @@ public class TwitterConsumerTests {
 
 	@Test
 	void contextLoads() {
+		
 	}
 
 }

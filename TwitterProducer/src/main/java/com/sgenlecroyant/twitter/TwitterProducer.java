@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.sgenlecroyant.twitter.client.TwitterClient;
 import com.sgenlecroyant.twitter.client.TwitterClientAuth;
 import com.sgenlecroyant.twitter.client.TwitterClientAuthService;
 import com.twitter.hbc.ClientBuilder;
@@ -38,18 +39,18 @@ public class TwitterProducer {
 		String consumerSecret = "zNr5E8Y76gcq2eiWlYlrot0rfbIef3vhlyiAHc7VjWMu8kbspc";
 		String token = "990132492949704705-O3hXe4BfUELS33CBpuerKhOjLunp5Yr";
 		String tokenSecret = "9znP4Au7uJv4oGGMLaUXmGDwI8oArs9sEU5y4Ij3uWuvV";
-		
+
 		TwitterClientAuth twitterClientAuth = new TwitterClientAuthService();
 
 		Authentication authentication = twitterClientAuth.authenticate(consumerKey, consumerSecret, token, tokenSecret);
 
 		StatusesFilterEndpoint statusesFilterEndpoint = new StatusesFilterEndpoint();
+		TwitterTermTracker twitterTermTracker = new TwitterTermTrackerService();
 		List<String> terms = Arrays.asList("bitcoin", "chelsea", "trump", "burundi");
-		statusesFilterEndpoint.trackTerms(terms);
+		twitterTermTracker.trackTerms(statusesFilterEndpoint, terms);
 
 		HosebirdMessageProcessor messageProcessor = new StringDelimitedProcessor(messages);
-		Client client = new ClientBuilder().authentication(authentication).endpoint(statusesFilterEndpoint).hosts(hosts)
-				.processor(messageProcessor).build();
+		Client client = TwitterClient.createClient(authentication, statusesFilterEndpoint, hosts, messageProcessor);
 
 		System.out.println("before connecting ...");
 		client.connect();

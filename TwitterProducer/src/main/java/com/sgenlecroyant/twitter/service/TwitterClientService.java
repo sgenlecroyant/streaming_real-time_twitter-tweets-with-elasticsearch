@@ -1,20 +1,13 @@
 package com.sgenlecroyant.twitter.service;
 
-import com.sgenlecroyant.twitter.client.TwitterClient;
+import java.util.concurrent.BlockingQueue;
+
 import com.twitter.hbc.core.Client;
 
-public class TwitterClientService implements TwitterClient{
-	
+public class TwitterClientService {
 
-	@Override
-	public void connect() {
+	public void startStreaming(Client client, BlockingQueue<String> messages, String message) {
 		
-	}
-
-	@Override
-	public Client createClient() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

@@ -24,7 +24,8 @@ public class TwitterKafkaConsumer {
 		configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KEY_DESERIALIZER);
 		configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, VALUE_DESERIALIZER);
-//		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-twitter-elasticsearch-1");
+		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-twitter-elasticsearch-1");
+//		configProps.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-twitter-elasticsearch-client-id-1");
 		return configProps;
 	}
 

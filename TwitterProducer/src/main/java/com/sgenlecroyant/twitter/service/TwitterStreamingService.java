@@ -2,9 +2,10 @@ package com.sgenlecroyant.twitter.service;
 
 import java.util.concurrent.BlockingQueue;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,17 @@ public class TwitterStreamingService implements TwitterStreamsRunner {
 					LOGGER.info(++count + ":" + message);
 					ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(
 							TWITTER_TWEET_TOPIC, message);
-					this.kafkaProducer.send(producerRecord);
+					this.kafkaProducer.send(producerRecord, new Callback() {
+
+						@Override
+						public void onCompletion(RecordMetadata metadata, Exception exception) {
+							if (exception == null) {
+								LOGGER.info("Record Sent With Success");
+							} else {
+								LOGGER.error("Error while sending records: {}", exception.getMessage());
+							}
+						}
+					});
 					message = null;
 				} catch (InterruptedException e) {
 					LOGGER.error("Encountered an error: " + e);

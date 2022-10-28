@@ -27,14 +27,8 @@ public class TwitterKafkaConsumerService {
 
 	public void consumeTweets() throws ElasticsearchException, IOException, InterruptedException {
 
-		System.out.println("Testing connection to Elasticsearch ...");
 		HealthResponse healthResponse = this.elasticsearchClient.cluster().health();
-		System.out.println("Done!");
-		Thread.sleep(1000);
 		System.out.println("Health Status: " + healthResponse.clusterName());
-		System.out.println("DONE!!!");
-		System.out.println("Bye!!!!");
-		System.exit(0);
 		Consumer<String, String> consumer = twitterKafkaConsumer.createTwitterKafkaConsumer();
 
 		consumer.subscribe(Arrays.asList("twitter-tweets"));

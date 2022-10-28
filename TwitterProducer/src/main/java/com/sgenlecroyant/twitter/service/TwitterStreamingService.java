@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sgenlecroyant.twitter.kafka.broker.twitter.producer.TwitterKafkaProducer;
+import com.sgenlecroyant.twitter.util.TwitterUtils;
 import com.twitter.hbc.core.Client;
 
 public class TwitterStreamingService implements TwitterStreamsRunner {
@@ -22,7 +23,6 @@ public class TwitterStreamingService implements TwitterStreamsRunner {
 	private static final String TWITTER_TWEET_TOPIC = "twitter-tweets";
 	private Producer<String, String> kafkaProducer;
 	private TwitterKafkaProducer twitterKafkaProducer = new TwitterKafkaProducer();
-	private ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public void startStreamingRealTimeTwitterFeeds(Client client, BlockingQueue<String> messages) {
@@ -35,7 +35,7 @@ public class TwitterStreamingService implements TwitterStreamsRunner {
 				try {
 					message = messages.take();
 					LOGGER.info(++count + ":" + message);
-					String key = this.extractTweetId(message);
+					String key = TwitterUtils.extractTweetId(message);
 					ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(
 							TWITTER_TWEET_TOPIC, key, message);
 					this.kafkaProducer.send(producerRecord, new Callback() {
@@ -56,21 +56,6 @@ public class TwitterStreamingService implements TwitterStreamsRunner {
 
 		}
 
-	}
-
-	public String extractTweetId(String tweetAsString) {
-		JsonNode tweetTree;
-		String tweetId = null;
-		try {
-			tweetTree = this.objectMapper.readTree(tweetAsString);
-			tweetId = tweetTree.get("id").asText();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return tweetId;
 	}
 
 }

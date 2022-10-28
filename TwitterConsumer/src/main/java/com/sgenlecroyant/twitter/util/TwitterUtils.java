@@ -9,8 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TwitterUtils {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TwitterUtils.class);
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(TwitterUtils.class);
+	
 	private static ObjectMapper objectMapper = new ObjectMapper();
 
 	public static String extractTweetId(String tweetAsString) {
@@ -26,4 +27,5 @@ public class TwitterUtils {
 		}
 		return tweetId;
 	}
+
 }

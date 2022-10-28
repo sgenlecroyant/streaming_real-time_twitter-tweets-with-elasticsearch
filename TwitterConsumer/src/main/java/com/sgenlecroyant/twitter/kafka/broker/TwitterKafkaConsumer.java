@@ -24,8 +24,12 @@ public class TwitterKafkaConsumer {
 		configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KEY_DESERIALIZER);
 		configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, VALUE_DESERIALIZER);
-		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-twitter-elasticsearch-1");
+		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "sgen-2"); // kafka-twitter-elasticsearch-1
 //		configProps.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-twitter-elasticsearch-client-id-1");
+		configProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, Integer.toString(20));
+		configProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, String.valueOf(false));
+		configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, String.valueOf("earliest"));
+
 		return configProps;
 	}
 

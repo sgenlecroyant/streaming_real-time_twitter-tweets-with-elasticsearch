@@ -1,5 +1,6 @@
 package com.sgenlecroyant.twitter.service;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 
@@ -9,7 +10,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sgenlecroyant.twitter.elasticsearch.ElasticsearchConfig;
 import com.sgenlecroyant.twitter.kafka.broker.TwitterKafkaConsumer;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.cluster.HealthResponse;
 
 public class TwitterKafkaConsumerService {
 
@@ -17,7 +23,18 @@ public class TwitterKafkaConsumerService {
 
 	private TwitterKafkaConsumer twitterKafkaConsumer = new TwitterKafkaConsumer();
 
-	public void consumeTweets() {
+	private ElasticsearchClient elasticsearchClient = ElasticsearchConfig.getElasticsearchClient("localhost", 9200);
+
+	public void consumeTweets() throws ElasticsearchException, IOException, InterruptedException {
+
+		System.out.println("Testing connection to Elasticsearch ...");
+		HealthResponse healthResponse = this.elasticsearchClient.cluster().health();
+		System.out.println("Done!");
+		Thread.sleep(1000);
+		System.out.println("Health Status: " + healthResponse.clusterName());
+		System.out.println("DONE!!!");
+		System.out.println("Bye!!!!");
+		System.exit(0);
 		Consumer<String, String> consumer = twitterKafkaConsumer.createTwitterKafkaConsumer();
 
 		consumer.subscribe(Arrays.asList("twitter-tweets"));
@@ -26,7 +43,7 @@ public class TwitterKafkaConsumerService {
 			ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(500));
 
 			for (ConsumerRecord<String, String> record : consumerRecords) {
-				this.logger.info("CONSUMED: KEY => {} : VALUE => {}",record.key(), record.value());
+				this.logger.info("CONSUMED: KEY => {} : VALUE => {}", record.key(), record.value());
 			}
 		}
 

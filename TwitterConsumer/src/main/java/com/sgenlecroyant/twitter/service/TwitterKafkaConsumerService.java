@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.elasticsearch.client.RequestOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,8 @@ public class TwitterKafkaConsumerService {
 		Consumer<String, String> consumer = twitterKafkaConsumer.createTwitterKafkaConsumer();
 
 		consumer.subscribe(Arrays.asList("twitter-tweets"));
-
+		// TODO: CREATE A TWEET MODEL AND MAP THE TWEET STRING TO THIS MODEL, TO SEE IF
+		// THIS CONTENT TYPE ERROR WILL BE FIXED
 		Map<String, String> tweetsBulkData = new HashMap<>();
 		while (true) {
 			BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
@@ -51,8 +53,8 @@ public class TwitterKafkaConsumerService {
 					String tweet = record.value();
 					String tweetId = TwitterUtils.extractTweetId(tweet);
 
-					tweetsBulkData.put(tweetId, tweet);
-//					this.logger.info("CONSUMED: KEY => {} : VALUE => {}", record.key(), record.value());
+					tweetsBulkData.put(tweetId, tweetId);
+					this.logger.info("CONSUMED: KEY => {} : VALUE => {}", record.key(), record.value());
 				}
 
 				for (Map.Entry<String, String> entry : tweetsBulkData.entrySet()) {
@@ -78,7 +80,8 @@ public class TwitterKafkaConsumerService {
 				System.out.println();
 				tweetsBulkData.clear();
 				bulkRequestBuilder = null;
-
+				
+				
 			} else {
 				logger.error("No Data Received");
 			}

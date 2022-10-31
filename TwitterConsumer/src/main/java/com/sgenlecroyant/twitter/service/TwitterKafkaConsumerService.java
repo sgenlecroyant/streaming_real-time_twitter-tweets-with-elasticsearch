@@ -15,8 +15,13 @@ import org.elasticsearch.client.RequestOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sgenlecroyant.twitter.elasticsearch.ElasticsearchConfig;
 import com.sgenlecroyant.twitter.kafka.broker.TwitterKafkaConsumer;
+import com.sgenlecroyant.twitter.model.Tweet;
 import com.sgenlecroyant.twitter.util.TwitterUtils;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -42,7 +47,7 @@ public class TwitterKafkaConsumerService {
 		consumer.subscribe(Arrays.asList("twitter-tweets"));
 		// TODO: CREATE A TWEET MODEL AND MAP THE TWEET STRING TO THIS MODEL, TO SEE IF
 		// THIS CONTENT TYPE ERROR WILL BE FIXED
-		Map<String, String> tweetsBulkData = new HashMap<>();
+		Map<String, Tweet> tweetsBulkData = new HashMap<>();
 		while (true) {
 			BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
 			ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(500));
@@ -52,12 +57,12 @@ public class TwitterKafkaConsumerService {
 				for (ConsumerRecord<String, String> record : consumerRecords) {
 					String tweet = record.value();
 					String tweetId = TwitterUtils.extractTweetId(tweet);
-
-					tweetsBulkData.put(tweetId, tweetId);
-					this.logger.info("CONSUMED: KEY => {} : VALUE => {}", record.key(), record.value());
+					Tweet tweetInstance = this.readWithObjectMapper(tweet);
+					tweetsBulkData.put(tweetId, tweetInstance);
+//					this.logger.info("CONSUMED: KEY => {} : VALUE => {}", record.key(), record.value());
 				}
 
-				for (Map.Entry<String, String> entry : tweetsBulkData.entrySet()) {
+				for (Map.Entry<String, Tweet> entry : tweetsBulkData.entrySet()) {
 
 					// @formatter:off
 					bulkRequestBuilder.operations((operation) -> operation
@@ -87,6 +92,16 @@ public class TwitterKafkaConsumerService {
 			}
 		}
 
+	}
+	
+	public Tweet readWithObjectMapper(String tweetAsString) throws JsonMappingException, JsonProcessingException, InterruptedException {
+		Tweet tweet = new Tweet();
+		JsonNode jsonNode = new ObjectMapper().readTree(tweetAsString);
+		String id = jsonNode.get("id").asText();
+		String text = jsonNode.get("text").asText();
+		tweet.setId(id);
+		tweet.setText(text);
+		return tweet;
 	}
 
 }

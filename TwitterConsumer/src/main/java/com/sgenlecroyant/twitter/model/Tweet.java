@@ -5,7 +5,7 @@ import java.util.Date;
 public class Tweet {
 
 	private String id;
-	private Date created_at;
+//	private Date created_at;
 	private String text;
 
 	public Tweet() {
@@ -20,13 +20,13 @@ public class Tweet {
 		this.id = id;
 	}
 
-	public Date getCreated_at() {
-		return created_at;
-	}
-
-	public void setCreated_at(Date created_at) {
-		this.created_at = created_at;
-	}
+//	public Date getCreated_at() {
+//		return created_at;
+//	}
+//
+//	public void setCreated_at(Date created_at) {
+//		this.created_at = created_at;
+//	}
 
 	public String getText() {
 		return text;
@@ -38,7 +38,7 @@ public class Tweet {
 
 	@Override
 	public String toString() {
-		return "Tweet [id=" + id + ", created_at=" + created_at + ", text=" + text + "]";
+		return "Tweet [id=" + id + ", text=" + text + "]";
 	}
 
 }

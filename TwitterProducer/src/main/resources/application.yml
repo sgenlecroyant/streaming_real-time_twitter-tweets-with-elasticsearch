@@ -1,2 +1,16 @@
 server:
   port: 8085
+  
+twitter:
+  consumerkey:
+    ${consumerKey}
+    
+  consumersecret:
+    ${consumerSecret}
+    
+  token:
+    ${token}
+    
+  tokensecret:
+    ${tokenSecret}
+

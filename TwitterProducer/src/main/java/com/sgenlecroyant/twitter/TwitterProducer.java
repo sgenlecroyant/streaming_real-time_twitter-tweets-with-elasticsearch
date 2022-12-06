@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -23,19 +25,27 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 
 @SpringBootApplication
-public class TwitterProducer {
+public class TwitterProducer implements CommandLineRunner {
+
+	@Autowired
+	private TwitterConfigService twitterConfigService;
 
 	public static void main(String[] args) throws InterruptedException {
 		SpringApplication.run(TwitterProducer.class, args);
+
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
 
 		BlockingQueue<String> messages = new ArrayBlockingQueue<>(1000);
 
 		Hosts hosts = new HttpHosts(Constants.STREAM_HOST);
 
-		String consumerKey = "QkVZbzd1tj5yrlWw5nDBMnWAC";
-		String consumerSecret = "zNr5E8Y76gcq2eiWlYlrot0rfbIef3vhlyiAHc7VjWMu8kbspc";
-		String token = "990132492949704705-O3hXe4BfUELS33CBpuerKhOjLunp5Yr";
-		String tokenSecret = "9znP4Au7uJv4oGGMLaUXmGDwI8oArs9sEU5y4Ij3uWuvV";
+		String consumerKey = this.twitterConfigService.getConsumerkey();
+		String consumerSecret = this.twitterConfigService.getConsumersecret();
+		String token = this.twitterConfigService.getToken();
+		String tokenSecret = this.twitterConfigService.getTokensecret();
 
 		TwitterClientAuth twitterClientAuth = new TwitterClientAuthService();
 
@@ -53,6 +63,7 @@ public class TwitterProducer {
 		TwitterStreamsRunner streamsRunner = new TwitterStreamingService();
 
 		streamsRunner.startStreamingRealTimeTwitterFeeds(client, messages);
+
 	}
 
 }
